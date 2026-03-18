@@ -1,0 +1,112 @@
+{
+  "activityTypes": [
+    {
+      "name": "Translation Match",
+      "description": "Match translations with their corresponding text",
+      "img": "https://res.cloudinary.com/dayfv4et9/image/upload/v1765430082/myquranjourney/Activity%20Assets/Translation_Match.png",
+      "color": "#FF5733"
+    },
+    {
+      "name": "List match",
+      "description": "Match items in a list with their pairs",
+      "img": "https://res.cloudinary.com/dayfv4et9/image/upload/v1765430082/myquranjourney/Activity%20Assets/List_Match.png",
+      "color": "#33FF57"
+    },
+    {
+      "name": "Card match",
+      "description": "Memory card matching game",
+      "img": "https://res.cloudinary.com/dayfv4et9/image/upload/v1765430082/myquranjourney/Activity%20Assets/Card_Match.png",
+      "color": "#3357FF"
+    },
+    {
+      "name": "Word discovery",
+      "description": "Discover hidden words",
+      "img": "https://res.cloudinary.com/dayfv4et9/image/upload/v1765430082/myquranjourney/Activity%20Assets/Word_Discovery.png",
+      "color": "#FF33A1"
+    },
+    {
+      "name": "Fill in the blanks",
+      "description": "Complete the sentence by filling in blanks",
+      "img": "https://res.cloudinary.com/dayfv4et9/image/upload/v1765430082/myquranjourney/Activity%20Assets/Fill_In_The_Blanks.png",
+      "color": "#FFC300"
+    },
+    {
+      "name": "Categorize it",
+      "description": "Categorize items into groups",
+      "img": "https://res.cloudinary.com/dayfv4et9/image/upload/v1765430082/myquranjourney/Activity%20Assets/Categorize_It.png",
+      "color": "#DAF7A6"
+    },
+    {
+      "name": "Multi answer choice",
+      "description": "Choose multiple correct answers",
+      "img": "https://res.cloudinary.com/dayfv4et9/image/upload/v1765430082/myquranjourney/Activity%20Assets/Multi_Answer_Choice.png",
+      "color": "#FF8C00"
+    },
+    {
+      "name": "Crossword puzzle",
+      "description": "Solve the crossword puzzle",
+      "img": "https://res.cloudinary.com/dayfv4et9/image/upload/v1765430082/myquranjourney/Activity%20Assets/Crossword_Puzzle.png",
+      "color": "#BA55D3"
+    },
+    {
+      "name": "Free Drawing",
+      "description": "Free drawing activity",
+      "img": "https://res.cloudinary.com/dayfv4et9/image/upload/v1765430082/myquranjourney/Activity%20Assets/Free_Drawing.png",
+      "color": "#20B2AA"
+    },
+    {
+      "name": "Maze quest",
+      "description": "Navigate through the maze",
+      "img": "https://res.cloudinary.com/dayfv4et9/image/upload/v1765430082/myquranjourney/Activity%20Assets/Maze_Quest.png",
+      "color": "#FF6347"
+    },
+    {
+      "name": "Complete the shape",
+      "description": "Complete the shape pattern",
+      "img": "https://res.cloudinary.com/dayfv4et9/image/upload/v1765430082/myquranjourney/Activity%20Assets/Complete_The_Shape.png",
+      "color": "#4682B4"
+    },
+    {
+      "name": "Fill the kabah",
+      "description": "Fill the Kabah coloring activity",
+      "img": "https://res.cloudinary.com/dayfv4et9/image/upload/v1765430082/myquranjourney/Activity%20Assets/Fill_The_Kabah.png",
+      "color": "#FFD700"
+    },
+    {
+      "name": "Locate It",
+      "description": "Locate the specified items",
+      "img": "https://res.cloudinary.com/dayfv4et9/image/upload/v1765430082/myquranjourney/Activity%20Assets/Locate_It.png",
+      "color": "#ADFF2F"
+    },
+    {
+      "name": "Hands-On Activity",
+      "description": "Interactive hands-on activity",
+      "img": "https://res.cloudinary.com/dayfv4et9/image/upload/v1765430082/myquranjourney/Activity%20Assets/Hands_On_Activity.png",
+      "color": "#00CED1"
+    },
+    {
+      "name": "Q&A (Short Answer)",
+      "description": "Answer short answer questions",
+      "img": "https://res.cloudinary.com/dayfv4et9/image/upload/v1765430082/myquranjourney/Activity%20Assets/QA_Short_Answer.png",
+      "color": "#FF4500"
+    },
+    {
+      "name": "Reflect & Respond",
+      "description": "Reflect and respond to prompts",
+      "img": "https://res.cloudinary.com/dayfv4et9/image/upload/v1765430082/myquranjourney/Activity%20Assets/Reflect_And_Respond.png",
+      "color": "#9370DB"
+    },
+    {
+      "name": "Photo match",
+      "description": "Match photos with their descriptions",
+      "img": "https://res.cloudinary.com/dayfv4et9/image/upload/v1765430082/myquranjourney/Activity%20Assets/Photo_Match.png",
+      "color": "#32CD32"
+    },
+    {
+      "name": "Keyword Drawing",
+      "description": "Draw based on keywords",
+      "img": "https://res.cloudinary.com/dayfv4et9/image/upload/v1765430082/myquranjourney/Activity%20Assets/Keyword_Drawing.png",
+      "color": "#FF1493"
+    }
+  ]
+}
