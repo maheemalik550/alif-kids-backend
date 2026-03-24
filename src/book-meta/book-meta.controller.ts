@@ -13,11 +13,11 @@ import { CreatePopularBookDto } from './dto/create-popular-book.dto';
 
 @Controller('book-meta')
 export class BookMetaController {
-  constructor(private readonly bookMetaService: BookMetaService) {}
+  constructor(private readonly bookMetaService: BookMetaService) { }
 
   @Get('popular-books')
   getPopularBooks() {
-    return this.bookMetaService.listAges();
+    return this.bookMetaService.getPopularBooks();
   }
 
   @Post('popular-books')
@@ -25,6 +25,11 @@ export class BookMetaController {
   @Roles('admin')
   createPopularBooks(@Body() dto: CreatePopularBookDto) {
     return this.bookMetaService.createPopularBooks(dto);
+  }
+
+  @Get('  ')
+  async getBooks() {
+    return this.bookMetaService.getAllBooks();
   }
 
 

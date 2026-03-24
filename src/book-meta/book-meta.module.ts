@@ -6,6 +6,7 @@ import { BookAge, BookAgeSchema } from './schemas/book-age.schema';
 import { BookCategory, BookCategorySchema } from './schemas/book-category.schema';
 import { BookType, BookTypeSchema } from './schemas/book-type.schema';
 import { PopularBook, PopularBookSchema } from './schemas/popular-book.schema';
+import { Book, BookSchema } from 'src/books/schemas/book.schema';
 
 @Module({
   imports: [
@@ -14,6 +15,8 @@ import { PopularBook, PopularBookSchema } from './schemas/popular-book.schema';
       { name: BookCategory.name, schema: BookCategorySchema },
       { name: BookType.name, schema: BookTypeSchema },
       { name: PopularBook.name, schema: PopularBookSchema },
+      { name: Book.name, schema: BookSchema },
+
 
     ]),
   ],

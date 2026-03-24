@@ -12,30 +12,48 @@ import { CreateBookTypeDto } from './dto/create-book-type.dto';
 import { UpdateBookTypeDto } from './dto/update-book-type.dto';
 import { CreatePopularBookDto } from './dto/create-popular-book.dto';
 import { PopularBook, PopularBookDocument } from './schemas/popular-book.schema';
+import { Book, BookDocument } from 'src/books/schemas/book.schema';
 
 @Injectable()
 export class BookMetaService {
   constructor(
     @InjectModel(BookAge.name) private readonly ageModel: Model<BookAgeDocument>,
+    @InjectModel(Book.name) private readonly bookModel: Model<BookDocument>,
+
     @InjectModel(BookCategory.name) private readonly categoryModel: Model<BookCategoryDocument>,
     @InjectModel(BookType.name) private readonly typeModel: Model<BookTypeDocument>,
     @InjectModel(PopularBook.name) private readonly popularBooksModel: Model<PopularBookDocument>,
 
-  ) {}
+  ) { }
 
   async createAge(dto: CreateBookAgeDto) {
     return this.ageModel.create({ ...dto, minAge: dto.minAge ?? 0, maxAge: dto.maxAge ?? 0 });
   }
 
 
-   async createPopularBooks(dto: CreatePopularBookDto) {
-    return this.popularBooksModel.create({ ...dto});
+  async createPopularBooks(dto: CreatePopularBookDto) {
+    return this.popularBooksModel.create({ ...dto });
   }
 
   async updateAge(id: string, dto: UpdateBookAgeDto) {
     const item = await this.ageModel.findByIdAndUpdate(id, dto, { new: true }).exec();
     if (!item) throw new BadRequestException('Age option not found');
     return item;
+  }
+
+
+  async getAllBooks() {
+    const [popular, trending, recomended] = await Promise.all([
+      this.bookModel.find({ isPopular: true }).lean(),
+      this.bookModel.find({ isTrending: true }).lean(),
+      this.bookModel.find({ isRecommended: true }).lean(),
+    ]);
+
+    return {
+      popular,
+      trending,
+      recomended,
+    };
   }
 
   async deleteAge(id: string) {
@@ -68,7 +86,12 @@ export class BookMetaService {
   }
 
   async listCategories() {
-    const data = await this.categoryModel.find().sort({ order: 1, name: 1 }).exec();
+    const data = await this.categoryModel.find().sort({ createdAt: -1 }).exec();
+    return { data };
+  }
+
+  async getPopularBooks() {
+    const data = await this.popularBooksModel.find().sort({ order: 1, name: 1 }).exec();
     return { data };
   }
 
@@ -95,19 +118,21 @@ export class BookMetaService {
     const data = await this.typeModel.find().sort({ order: 1, name: 1 }).exec();
     return { data };
   }
+  languages = [
+    { title: 'English', countryCode: 'gb' },
+    { title: 'Arabic', countryCode: 'sa' },
+    { title: 'Urdu', countryCode: 'pk' },
+    { title: 'Turkish', countryCode: 'tr' },
+    { title: 'Spanish', countryCode: 'es' },
+    { title: 'French', countryCode: 'fr' },
+    { title: 'Bengali', countryCode: 'bd' },
+    { title: 'Malay', countryCode: 'my' },
+  ];
 
-  getLanguages() {
-    return {
-      data: [
-        'English',
-        'Arabic',
-        'Urdu',
-        'Turkish',
-        'Spanish',
-        'French',
-        'Bengali',
-        'Malay',
-      ].map((name) => ({ name, value: name })),
-    };
+  async getLanguages() {
+    return await this.languages.map((lang) => ({
+      title: lang.title,
+      flag: `https://flagcdn.com/${lang.countryCode}.svg`, // SVG = sharp at any size
+    }));
   }
 }
