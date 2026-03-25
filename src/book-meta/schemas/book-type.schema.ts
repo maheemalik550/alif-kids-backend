@@ -8,6 +8,9 @@ export class BookType {
   @Prop({ required: true, trim: true, unique: true })
   name: string;
 
+  @Prop({ required: false, trim: true })
+  description: string;
+
   @Prop({ default: 0 })
   order: number;
 

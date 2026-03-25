@@ -5,6 +5,10 @@ export class CreateBookTypeDto {
   name: string;
 
   @IsOptional()
+  @IsString()
+  description: string;
+
+  @IsOptional()
   @IsNumber()
   order?: number;
 

@@ -17,7 +17,7 @@ import {
   Query,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { CreateAuthDto } from './dto/create-auth.dto';
+import { CreateAuthDto, ResendOtpDto } from './dto/create-auth.dto';
 import { UpdateAuthDto } from './dto/update-auth.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { RolesGuard } from './guards/roles.guard';
@@ -98,6 +98,36 @@ export class AuthController {
   async setPasswordByToken(@Body() dto: SetPasswordByTokenDto) {
     return this.authService.setPasswordByInviteToken(dto);
   }
+
+
+  @Post('generate')
+  resendOtp(@Body() resendOtpDto: ResendOtpDto) {
+    return this.authService.resendOtp(resendOtpDto.email);
+  }
+  // reset password 
+  //  @Post('forget-password')
+  // forgetPassword(
+  //   @Req() req: any,
+  //   @Body() forgetPasswordDto: ForgetPasswordDto
+  // ) {
+  //   return this.authService.forgetPassword(forgetPasswordDto.email);
+  // }
+
+  // @Post('verify-forget-password')
+  // verifyForgetPassword(
+  //   @Req() req: any,
+  //   @Body() verifyForgetPassword: VerifyForgetPassword
+  // ) {
+  //   return this.authService.verifyForgetPassword(verifyForgetPassword);
+  // }
+
+  // @Post('reset-password')
+  // resetPassword(
+  //   @Req() req: any,
+  //   @Body() resetPasswordDto: ResetPasswordDto
+  // ) {
+  //   return this.authService.resetPassword(resetPasswordDto);
+  // }
 
   @Post('refresh')
   refresh(

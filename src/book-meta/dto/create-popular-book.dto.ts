@@ -2,9 +2,9 @@ import { IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class CreatePopularBookDto {
   @IsString()
-  title: string;
+  name: string;
 
   @IsOptional()
   @IsString()
-  image?: string;
+  coverImage?: string;
 }

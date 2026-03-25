@@ -3,6 +3,7 @@ import {
   HttpException,
   HttpStatus,
   Injectable,
+  InternalServerErrorException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { CreateAuthDto } from './dto/create-auth.dto';
@@ -16,15 +17,28 @@ import { generateTokens } from '../utils/token';
 import { addToBlacklist, isBlacklisted } from '../utils/tokenBlacklist';
 import { SetPasswordDto } from './dto/set-password.dto';
 import { SetPasswordByTokenDto } from './dto/set-password-by-token.dto';
-import { sendMail, sendNewUserEmail } from '../common/helpers';
+import { emailTemplates, sendMail, sendNewUserEmail } from '../common/helpers';
 import { VouchersService } from '../vouchers/vouchers.service';
+import { UserOtp } from './schemas/otp.schema';
+import { internalErrorHandler } from 'src/utils/utility.helper';
+import { templates } from 'src/common/helpers/template';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectModel(User.name) private userModel: Model<User>,
+    @InjectModel(UserOtp.name) private otpModel: Model<UserOtp>,
     private vouchersService: VouchersService,
-  ) {}
+
+  ) { }
+
+
+
+  private generateOTP(): string {
+    return Math.floor(Math.random() * 100000)
+      .toString()
+      .padStart(5, '0');
+  }
 
   async register(createAuthDto: CreateAuthDto, res) {
     const {
@@ -152,13 +166,66 @@ export class AuthService {
     };
   }
 
-  async login(createAuthDto: CreateAuthDto, res, req) {
-    // const refreshToken = req.cookies?.refreshToken;
+  // async login(createAuthDto: CreateAuthDto, res, req) {
+  //   try {
+  //     const { email, password } = createAuthDto;
 
+  //   const newUser = await this.userModel.findOne({ email });
+  //   if (!newUser) throw new UnauthorizedException('Invalid credentials');
+  //   if (newUser.isAccountDeleted) {
+  //     throw new UnauthorizedException('Account has been deleted');
+  //   }
+
+  //   const isPasswordValid = await bcrypt.compare(password, newUser.password);
+  //   if (!isPasswordValid)
+  //     throw new UnauthorizedException('Invalid credentials');
+
+  //   const { accessToken, refreshToken } = generateTokens({
+  //     id: newUser?._id?.toString(),
+  //     username: newUser?.username,
+  //     inAppUserId: Array.isArray(newUser?.inAppUserId)
+  //       ? newUser?.inAppUserId[0]
+  //       : newUser?.inAppUserId,
+  //     email: newUser?.email,
+  //     premiumSubscription: newUser?.premiumSubscription,
+  //     role: newUser?.role,
+  //   });
+
+  //   newUser['refreshToken'] = refreshToken;
+
+  //   // 🧾 Generate JWT
+  //   // const payload = user; // Simplified for this example
+  //   // const token = await this.jwtService.signAsync(user);
+
+  //   // send refresh token as secure cookie
+  //   res.cookie('refreshToken', refreshToken, {
+  //     httpOnly: true,
+  //     secure: process.env.NODE_ENV === 'production',
+  //     sameSite: 'strict',
+  //     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+  //   });
+
+  //   return {
+  //     success: true,
+  //     message: 'Login successful',
+  //     accessToken,
+  //     refreshToken,
+  //   };
+  //   } catch (error) {
+  //      if (error instanceof HttpException) {
+  //       throw error;
+  //     }
+  //     return internalErrorHandler('Login failed', error);
+  //   }
+  // }
+
+  async login(createAuthDto: CreateAuthDto, res, req) {
+  try {
     const { email, password } = createAuthDto;
 
     const newUser = await this.userModel.findOne({ email });
     if (!newUser) throw new UnauthorizedException('Invalid credentials');
+
     if (newUser.isAccountDeleted) {
       throw new UnauthorizedException('Account has been deleted');
     }
@@ -168,28 +235,24 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
 
     const { accessToken, refreshToken } = generateTokens({
-      id: newUser?._id?.toString(),
-      username: newUser?.username,
-      inAppUserId: Array.isArray(newUser?.inAppUserId)
-        ? newUser?.inAppUserId[0]
-        : newUser?.inAppUserId,
-      email: newUser?.email,
-      premiumSubscription: newUser?.premiumSubscription,
-      role: newUser?.role,
+      id: newUser._id.toString(),
+      username: newUser.username,
+      inAppUserId: Array.isArray(newUser.inAppUserId)
+        ? newUser.inAppUserId[0]
+        : newUser.inAppUserId,
+      email: newUser.email,
+      premiumSubscription: newUser.premiumSubscription,
+      role: newUser.role,
     });
 
-    newUser['refreshToken'] = refreshToken;
+    newUser.refreshToken = refreshToken;
+    await newUser.save();
 
-    // 🧾 Generate JWT
-    // const payload = user; // Simplified for this example
-    // const token = await this.jwtService.signAsync(user);
-
-    // send refresh token as secure cookie
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
     return {
@@ -198,7 +261,14 @@ export class AuthService {
       accessToken,
       refreshToken,
     };
+  } catch (error) {
+    if (error instanceof HttpException) {
+      throw error;
+    }
+
+    throw new InternalServerErrorException('Login failed');
   }
+}
 
   async setPassword(setPasswordDto: SetPasswordDto) {
     const { email, password, inAppUserId } = setPasswordDto;
@@ -259,6 +329,144 @@ export class AuthService {
       message: 'Password set successfully',
     };
   }
+
+
+
+
+
+  // reset password
+
+  // resend otp
+  async resendOtp(email: string) {
+    const user = await this.userModel.findOne({ email });
+    if (!user) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
+    const newOtp = this.generateOTP();
+    user.otp = newOtp;
+
+    console.log('otp',newOtp)
+
+    await user.save();
+    // const html = emailTemplates.otp(user.username, newOtp); // reuse your OTP template
+    await sendMail({
+      email: email,
+      subject: "Forget Password Otp",
+      htmlTemplate:  templates.otp('forgotPassword', { name: user?.email, otp:newOtp }),
+    });
+
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'OTP has been resent successfully',
+      data: {
+        user: {
+          _id: user._id,
+          email: user.email,
+          username: user.username,
+          role: user.role,
+          otp: newOtp,
+        },
+      },
+    };
+  }
+
+
+  // async verifyForgetPassword(
+  //   verifyForgetPassword: VerifyForgetPassword
+  // ) {
+  //   try {
+  //     const { otp } = verifyForgetPassword;
+  //     const user = await this.userModel.findOne({ otp });
+  //     if (!user) {
+  //       throw new HttpException('Invalid OTP', HttpStatus.UNAUTHORIZED);
+  //     }
+
+  //     if (new Date() > user.otpExpires) {
+  //       throw new HttpException('OTP has expired', HttpStatus.UNAUTHORIZED);
+  //     }
+
+  //     return {
+  //       statusCode: HttpStatus.OK,
+  //       message: 'Otp Verified',
+  //       data: {
+  //         user: {
+  //           _id: user._id,
+  //           email: user.email,
+  //           username: user.username,
+  //           role: user.role,
+  //           isVerified: user.isVerified,
+  //           profileImage: user.profileImage,
+  //           country: user.country,
+  //           phoneNumber: user.phoneNumber,
+  //           ageGroup: user.ageGroup,
+  //           soundEffect: user.soundEffect,
+  //           timer: user.timer
+  //         }
+  //       }
+  //     };
+  //   } catch (error) {
+  //     if (error instanceof HttpException) {
+  //       throw error;
+  //     }
+  //     throw new HttpException('Internal server error', HttpStatus.INTERNAL_SERVER_ERROR);
+  //   }
+  // }
+
+  // async resetPassword(
+  //   resetPassword: ResetPasswordDto
+  // ) {
+  //   try {
+  //     const { email, newPassword } = resetPassword;
+  //     const user = await this.userModel.findOne({ email });
+  //     if (!user) {
+  //       throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+  //     }
+
+  //     const isSamePassword = await bcrypt.compare(newPassword, user.password);
+  //     if (isSamePassword) {
+  //       throw new HttpException(
+  //         'New password cannot be the same as the current password',
+  //         HttpStatus.BAD_REQUEST
+  //       );
+  //     }
+
+  //     const hashedPassword = await bcrypt.hash(newPassword, 10);
+  //     await this.userModel.updateOne(
+  //       { email },
+  //       {
+  //         password: hashedPassword,
+  //         otp: null,
+  //         otpExpires: null,
+  //       },
+  //     );
+
+
+  //     return {
+  //       statusCode: HttpStatus.OK,
+  //       message: 'Password Reset SuccessFully',
+  //       data: {
+  //         user: {
+  //           _id: user._id,
+  //           email: user.email,
+  //           username: user.username,
+  //           role: user.role,
+  //           isVerified: user.isVerified,
+  //           profileImage: user.profileImage,
+  //           country: user.country,
+  //           phoneNumber: user.phoneNumber,
+  //           ageGroup: user.ageGroup,
+  //           soundEffect: user.soundEffect,
+  //           timer: user.timer
+  //         }
+  //       }
+  //     };
+  //   } catch (error) {
+  //     if (error instanceof HttpException) {
+  //       throw error;
+  //     }
+  //     throw new HttpException('Internal server error', HttpStatus.INTERNAL_SERVER_ERROR);
+  //   }
+  // }
 
 
   async sendInvite(userId: string) {

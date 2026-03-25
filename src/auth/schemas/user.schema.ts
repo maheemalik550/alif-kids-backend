@@ -12,7 +12,7 @@ export class User extends Document {
   @Prop({ required: false, type: [String] })
   inAppUserId: string[];
 
-  @Prop({ required: true, default: false })
+  @Prop({ required: false, default: false })
   premiumSubscription: boolean;
 
   @Prop({ required: false, default: false })
@@ -59,6 +59,9 @@ export class User extends Document {
 
   @Prop({ type: Date, default: null })
   voucherAppliedAt: Date;
+
+   @Prop({ default: null })
+  otp: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

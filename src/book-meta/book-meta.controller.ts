@@ -27,7 +27,7 @@ export class BookMetaController {
     return this.bookMetaService.createPopularBooks(dto);
   }
 
-  @Get('  ')
+  @Get('books')
   async getBooks() {
     return this.bookMetaService.getAllBooks();
   }
